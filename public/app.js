@@ -1,20 +1,22 @@
-{/* 
-Need to ininitialize the state of products 
-Need to set the state of products
-*/} 
+console.log('hello');
 
 var ProductTable = React.createClass({
+
+  getInitialState: function() {
+    return {data: []}
+  },
   propTypes: {
     url: React.PropTypes.string.isRequired,
   },
   loadProductsFromServer: function() {
+    console.log('I am being triggered')
     var self = this;
     $.ajax({
       url: this.props.url,
       method: 'GET'
     }).done(function(data){
-      {/* A JSX comment */}
-      {/* Your code here */}
+      console.log(data);
+      self.setState({data: data});
     })
   },
   componentDidMount: function() {
@@ -23,36 +25,40 @@ var ProductTable = React.createClass({
   render: function() {
     return (
       <div>
-        <ProductList products={this.state.SOMETHING} />
+        <ProductList products={this.state.data} />
       </div>
       )
   }
 });
-
-
-{/* 
-Filter through products and map only products in stock..
-Replace the table body section with dynamic data.
-*/}  
+  
 
 var  ProductList = React.createClass({
   render: function() {
-        return (
+    var inStock = function(p) {
+      return p.inStock;
+    };
+    var productInStock = this.props.products.filter(inStock).map(function(t) {
+      return (
+          <tr>
+            <td> { t.name } </td>
+            <td> { t.cost } </td>
+            <td> { t.inStock.toString() } </td>
+          </tr>
+        )
+      })
+
+  return (
         <div>
           <table className="table table-striped">
             <thead>
               <tr>
                 <th>product</th>
-                <th>cost </th>
+                <th> cost </th>
                 <th> inStock </th>
               </tr>
             </thead>
             <tbody>
-            <tr>
-              <td> each name </td>
-              <td> each cost </td>
-              <td> inStock is true </td>
-            </tr>
+              { productInStock }
             </tbody>
           </table>
         </div>
@@ -60,5 +66,6 @@ var  ProductList = React.createClass({
   }
 });
 
-React.render(<ProductTable />, document.getElementById('react-container'));
-{/* WHICH URL IS USED TO GET ALL PRODUCTS? */}
+React.render(<ProductTable url="api/products" />, document.getElementById('react-container'));
+
+
